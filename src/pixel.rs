@@ -97,7 +97,7 @@ impl RawPixels {
                 Ok(Self::Indexed(bytes))
             }
             PixelFormat::Grayscale => {
-                if bytes.len() % 2 != 0 {
+                if !bytes.len().is_multiple_of(2) {
                     return Err(AsepriteParseError::InvalidInput(
                         "Incorrect length of bytes for Grayscale image data".to_string(),
                     ));
@@ -106,7 +106,7 @@ impl RawPixels {
                 pixels.map(Self::Grayscale)
             }
             PixelFormat::Rgba => {
-                if bytes.len() % 4 != 0 {
+                if !bytes.len().is_multiple_of(4) {
                     return Err(AsepriteParseError::InvalidInput(
                         "Incorrect length of bytes for RGBA image data".to_string(),
                     ));
@@ -188,7 +188,7 @@ impl RawPixels {
 impl Pixels {
     // Returns a Borrowed Cow if the Pixels struct already contains Rgba pixels.
     // Otherwise clones them to create an Owned Cow.
-    pub(crate) fn clone_as_image_rgba(&self) -> Cow<Vec<image::Rgba<u8>>> {
+    pub(crate) fn clone_as_image_rgba(&self) -> Cow<'_, [image::Rgba<u8>]> {
         match self {
             Pixels::Rgba(rgba) => Cow::Borrowed(rgba),
             Pixels::Grayscale(grayscale) => {

@@ -102,7 +102,7 @@ impl<'a> Layer<'a> {
     ///
     /// Does not indicate the blend order of layers (i.e., which layers are
     /// above or below).
-    pub fn parent(&self) -> Option<Layer> {
+    pub fn parent(&self) -> Option<Layer<'_>> {
         self.file.layers.parents[self.layer_id as usize].map(|id| Layer {
             file: self.file,
             layer_id: id,
@@ -118,7 +118,7 @@ impl<'a> Layer<'a> {
     }
 
     /// Get a reference to the Cel for this frame in the layer.
-    pub fn frame(&self, frame_id: u32) -> Cel {
+    pub fn frame(&self, frame_id: u32) -> Cel<'_> {
         assert!(frame_id < self.file.num_frames());
         let cel_id = CelId {
             frame: frame_id as u16,

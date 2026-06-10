@@ -524,7 +524,7 @@ fn user_data_cel() {
 fn user_data_tags() {
     let f = load_test_file("user_data");
     let tags = f.tags;
-    let first = tags.get(0).and_then(|t| t.user_data()).unwrap();
+    let first = tags.first().and_then(|t| t.user_data()).unwrap();
     let second = tags.get(1).and_then(|t| t.user_data()).unwrap();
     let third = tags.get(2).and_then(|t| t.user_data()).unwrap();
 

@@ -160,7 +160,7 @@ impl AsepriteFile {
     /// # Panics
     ///
     /// Panics if the ID is not valid. ID must be less than number of layers.
-    pub fn layer(&self, id: u32) -> Layer {
+    pub fn layer(&self, id: u32) -> Layer<'_> {
         assert!(id < self.num_layers());
         Layer {
             file: self,
@@ -172,7 +172,7 @@ impl AsepriteFile {
     ///
     /// If multiple layers with the same name exist returns the layer with
     /// the lower ID.
-    pub fn layer_by_name(&self, name: &str) -> Option<Layer> {
+    pub fn layer_by_name(&self, name: &str) -> Option<Layer<'_>> {
         for layer_id in 0..self.num_layers() {
             let l = self.layer(layer_id);
             if l.name() == name {
@@ -183,7 +183,7 @@ impl AsepriteFile {
     }
 
     /// An iterator over all layers.
-    pub fn layers(&self) -> LayersIter {
+    pub fn layers(&self) -> LayersIter<'_> {
         LayersIter {
             file: self,
             next: 0,
@@ -195,7 +195,7 @@ impl AsepriteFile {
     /// # Panics
     ///
     /// Panics if `index` is not less than `num_frames`.
-    pub fn frame(&self, index: u32) -> Frame {
+    pub fn frame(&self, index: u32) -> Frame<'_> {
         assert!(index < self.num_frames as u32);
         Frame { file: self, index }
     }
@@ -208,7 +208,7 @@ impl AsepriteFile {
     ///
     /// Panics if `frame` is not less than `num_frames` or if `layer` is not
     /// less than `num_layers`.
-    pub fn cel(&self, frame: u32, layer: u32) -> Cel {
+    pub fn cel(&self, frame: u32, layer: u32) -> Cel<'_> {
         assert!(frame < self.num_frames as u32 && layer < self.num_layers());
         Cel {
             file: self,
@@ -264,7 +264,7 @@ impl AsepriteFile {
     /// Get the [Tilemap] at the given cel.
     ///
     /// Returns `None` if the cel is empty or if it is not a tilemap.
-    pub fn tilemap(&self, layer_id: u32, frame: u32) -> Option<Tilemap> {
+    pub fn tilemap(&self, layer_id: u32, frame: u32) -> Option<Tilemap<'_>> {
         if layer_id >= self.num_layers() || frame >= self.num_frames() {
             return None;
         }
@@ -278,8 +278,8 @@ impl AsepriteFile {
                 let pixel_width = self.width() as u32;
                 let pixel_height = self.height() as u32;
                 let (tile_width, tile_height) = tileset.tile_size().into();
-                let w = (pixel_width + tile_width - 1) / tile_width;
-                let h = (pixel_height + tile_height - 1) / tile_height;
+                let w = pixel_width.div_ceil(tile_width);
+                let h = pixel_height.div_ceil(tile_height);
                 assert!(w < (1u32 << 16) && h < (1u32 << 16));
                 Some(Tilemap {
                     cel,
@@ -447,7 +447,7 @@ impl<'a> Frame<'a> {
     }
 
     /// Get cel corresponding to the given layer in this frame.
-    pub fn layer(&self, layer_id: u32) -> Cel {
+    pub fn layer(&self, layer_id: u32) -> Cel<'_> {
         assert!(layer_id < self.file.num_layers());
         let cel_id = CelId {
             frame: self.index as u16,

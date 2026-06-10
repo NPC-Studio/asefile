@@ -262,7 +262,7 @@ impl CelsData<RawPixels> {
                     frame: frame as u16,
                     layer: layer as u16,
                 };
-                is_linkable_cel.push(self.cel(cel_id).map_or(false, |c| c.content.is_raw()));
+                is_linkable_cel.push(self.cel(cel_id).is_some_and(|c| c.content.is_raw()));
             }
         }
         let validate_ref = |id: CelId| {
